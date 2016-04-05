@@ -9,14 +9,15 @@ namespace basicGameEngine
 {
     class Player
     {
-        public int x, y, size, speed;
+        public int x, y, width, height, speed;
         public Image[] image = new Image[4];
 
-        public Player(int _x, int _y, int _size, int _speed, Image[] _image)
+        public Player(int _x, int _y, int _width, int _height, int _speed, Image[] _image)
         {
             x = _x;
             y = _y;
-            size = _size;
+            width = _width;
+            height = _height;
             speed = _speed;
             image = _image;
         }
@@ -43,7 +44,7 @@ namespace basicGameEngine
 
         public bool collision(Player p, Monster m)
         {
-            Rectangle pRec = new Rectangle(p.x, p.y, p.size, p.size);
+            Rectangle pRec = new Rectangle(p.x, p.y, p.width, p.height);
             Rectangle mRec = new Rectangle(m.x, m.y, m.size, m.size);
 
             if (pRec.IntersectsWith(mRec))
