@@ -45,7 +45,7 @@ namespace basicGameEngine
         public bool collision(Player p, Monster m)
         {
             Rectangle pRec = new Rectangle(p.x, p.y, p.width, p.height);
-            Rectangle mRec = new Rectangle(m.x, m.y, m.size, m.size);
+            Rectangle mRec = new Rectangle(m.x, m.y, m.width, m.height);
 
             if (pRec.IntersectsWith(mRec))
             {
