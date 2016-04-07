@@ -20,7 +20,7 @@ namespace basicGameEngine
         Player p;
 
         List<Monster> monsterList = new List<Monster>();
-        int monsterX, monsterY, monsterSpeed, monsterSpawn;//monsterSpawn counts the number of shots to spawn monsters.
+        int monsterX, monsterY, monsterSpeed, monsterWidth, monsterHeight, monsterDirection, monsterSpawn;//monsterSpawn counts the number of shots to spawn monsters.
         Random randGen = new Random();
 
         Image[] monsterImage = new Image[4];
@@ -51,7 +51,7 @@ namespace basicGameEngine
 
         private void GameScreen_Load(object sender, EventArgs e)
         {
-            shotOk = 20;
+            shotOk = 5;
             playerDrawX = this.Width / 2;
             playerDrawY = this.Height / 2;
             p = new Player(playerDrawX, playerDrawY, Properties.Resources.RedGuyDown.Width, Properties.Resources.RedGuyDown.Height, 5, heroImage);
@@ -59,8 +59,6 @@ namespace basicGameEngine
             monsterX = randGen.Next(0, this.Width - Properties.Resources.monsterDown.Width - 20);
             monsterY = randGen.Next(0, this.Height - Properties.Resources.monsterDown.Height - 20);
             monsterSpeed = 2;
-            Monster m = new Monster(monsterX, monsterY, Properties.Resources.monsterUp.Width, Properties.Resources.monsterUp.Height, monsterSpeed, monsterImage);
-            monsterList.Add(m);
             monsterSpawn = 20;
 
             this.Focus();
@@ -118,7 +116,7 @@ namespace basicGameEngine
 
         private void gameTimer_Tick(object sender, EventArgs e)
         {
-            shotOk--;
+            #region Player Movement
 
             //checks to see if any keys have been pressed and adjusts the X or Y value
             //for the Player appropriately
@@ -155,26 +153,142 @@ namespace basicGameEngine
                 }
             }
 
-            if (shotOk == 0)
+            #endregion
+
+            #region Bullet Movement
+
+            shotOk--;
+
+            if (shot)
             {
-                if (shot)
+                if (shotOk < 0)
                 {
                     if (direction == 0)
                     {
-                        Bullets b = new Bullets(p.x + Properties.Resources.RedGuyDown.Width / 2, p.y + Properties.Resources.RedGuyDown.Height, 10, 10, "down");
+                        Bullets b = new Bullets(p.x + p.width / 2, p.y + p.height / 2, 10, 10, "down");
+                        bulletsList.Add(b);
+                        shotOk = 25;
+                        monsterSpawn--;
+                    }
+                    else if(direction == 1)
+                    {
+                        Bullets b = new Bullets(p.x + p.width / 2, p.y + p.height / 2, 10, 10, "up");
+                        bulletsList.Add(b);
+                        shotOk = 25;
+                        monsterSpawn--;
+                    }
+                    else if(direction == 2)
+                    {
+                        Bullets b = new Bullets(p.x + p.width / 2, p.y + p.height / 2, 10, 10, "left");
+                        bulletsList.Add(b);
+                        shotOk = 25;
+                        monsterSpawn--;
+                    }
+                    else if(direction == 3)
+                    {
+                        Bullets b = new Bullets(p.x + p.width / 2, p.y + p.height / 2, 10, 10, "right");
+                        bulletsList.Add(b);
+                        shotOk = 25;
+                        monsterSpawn--;
                     }
                 }
-
             }
+
+            foreach(Bullets b in bulletsList)
+            {
+                b.move(b);
+            }
+
+            //Remove Bullets
+            foreach(Bullets b in bulletsList)
+            {
+                if(b.x + b.size < 0 || b.x + b.size > this.Width)
+                {
+                    bulletsList.Remove(b);
+                    break;
+                }
+                else if (b.y + b.size < 0 || b.y + b.size > this.Height)
+                {
+                    bulletsList.Remove(b);
+                     break;
+                }
+             }
+
+            #endregion
+
+            #region Monster Spawning
+
+            if (monsterList.Count() == 0 || monsterSpawn == 0)
+            {
+                monsterDirection = randGen.Next(0, 4);
+                if (monsterDirection == 0 || monsterDirection == 1)
+                {
+                    monsterWidth = Properties.Resources.monsterDown.Width;
+                    monsterHeight = Properties.Resources.monsterDown.Height;
+                }
+                else if (monsterDirection == 2 || monsterDirection == 3)
+                {
+                    monsterWidth = Properties.Resources.monsterLeft.Width;
+                    monsterHeight = Properties.Resources.monsterLeft.Height;
+                }
+
+                Monster m = new Monster(monsterX, monsterY, monsterWidth, monsterHeight, 4, monsterDirection, monsterImage);
+                monsterList.Add(m);
+                monsterSpawn = 20;
+            }
+
+            #endregion
+
+            #region Monster Move
+
+            foreach (Monster m in monsterList)
+            {
+                if(m.x >= 0 && m.y >= 0 && m.y < this.Height + m.height && m.x < this.Width + m.width)
+                {
+                    m.move(m, m.mDirection);
+                }
+
+                if (m.x < 5 || m.y < 5 || m.x + m.width > this.Width - 5 || m.y + m.height > this.Width - 5)
+                {
+                    if (m.mDirection == 0)
+                    {
+                        m.mDirection = 1;
+                        break;
+                    }
+                    else if (m.mDirection == 1)
+                    {
+                        m.mDirection = 0;
+                        break;
+                    }
+                    else if (m.mDirection == 2)
+                    {
+                        m.mDirection = 3;
+                        break;
+                    }
+                    else if (m.mDirection == 3)
+                    {
+                        m.mDirection = 2;
+                        break;
+                    }
+                }
+            }
+
+            #endregion
+
             Refresh();
         }
 
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.DrawImage(p.image[direction], p.x, p.y);
+
             foreach(Bullets b in bulletsList)
             {
                 e.Graphics.FillRectangle(bulletBrush, b.x, b.y, b.size, b.size);
+            }
+            foreach(Monster m in monsterList)
+            {
+                e.Graphics.DrawImage(m.image[m.mDirection], m.x, m.y);
             }
         }
     }

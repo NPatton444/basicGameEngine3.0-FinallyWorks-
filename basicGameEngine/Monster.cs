@@ -9,34 +9,35 @@ namespace basicGameEngine
 {
     class Monster
     {
-        public int x, y, width, height, speed;
+        public int x, y, width, height, speed, mDirection;
         public Image[] image = new Image[4];
 
-        public Monster(int _x, int _y, int _width, int _height, int _speed, Image[] _image)
+        public Monster(int _x, int _y, int _width, int _height, int _speed, int _mDirection, Image[] _image)
         {
             x = _x;
             y = _y;
             width = _width;
             height = _height;
             speed = _speed;
+            mDirection = _mDirection;
             image = _image;
         }
 
-        public void move(Monster m, string direction)
+        public void move(Monster m, int direction)
         {
-            if (direction == "left")
+            if (direction == 2)
             {
                 m.x -= m.speed;
             }
-            else if (direction == "right")
+            else if (direction == 3)
             {
                 m.x += m.speed;
             }
-            else if (direction == "down")
+            else if (direction == 0)
             {
                 m.y += m.speed;
             }
-            else if (direction == "up")
+            else if (direction == 1)
             {
                 m.y -= m.speed;
             }
