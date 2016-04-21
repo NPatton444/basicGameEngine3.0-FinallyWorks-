@@ -20,6 +20,10 @@ namespace basicGameEngine
             direction = _direction;
         }
 
+        /// <summary>
+        /// Bullet Movement
+        /// </summary>
+        /// <param name="b">Bullet Object</param>
         public void move(Bullets b)
         {
             if (b.direction == "left")

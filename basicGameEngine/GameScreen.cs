@@ -12,13 +12,17 @@ namespace basicGameEngine
 {
     public partial class GameScreen : UserControl
     {
+        //Player movement and shooting
         bool leftArrowDown, downArrowDown, rightArrowDown, upArrowDown, shot;
         int playerDrawX, playerDrawY, direction, shotOk;
 
+        //Player images
         Image[] heroImage = new Image[4];
 
+        //Create Player object variable
         Player p;
 
+        //List of monsters
         List<Monster> monsterList = new List<Monster>();
         int monsterSpeed, monsterWidth, monsterHeight, monsterDirection, monsterSpawn;//monsterSpawn counts the number of shots to spawn monsters.
         Random randGen = new Random();
@@ -26,11 +30,13 @@ namespace basicGameEngine
 
         Image[] monsterImage = new Image[4];
 
+        //Bullet list and Draw Brush
         List<Bullets> bulletsList = new List<Bullets>();
         SolidBrush bulletBrush = new SolidBrush(Color.White);
 
         int score = 0;
 
+        //Adds to the score every 15 cycles
         int scoreIncrement = 15;
 
         public GameScreen()
@@ -56,13 +62,15 @@ namespace basicGameEngine
 
         private void GameScreen_Load(object sender, EventArgs e)
         {
-            shotOk = 5;
+            shotOk = 5;//Allows shooting every 5 cylces
+            //Player initial start points
             playerDrawX = this.Width / 2;
             playerDrawY = this.Height / 2;
+            //Player object creation
             p = new Player(playerDrawX, playerDrawY, Properties.Resources.RedGuyDown.Width, Properties.Resources.RedGuyDown.Height, 5, heroImage);
 
             monsterSpeed = 2;
-            monsterSpawn = 20;
+            monsterSpawn = 20;//Spawns monster every 20 shots fired
 
             this.Focus();
         }
@@ -160,11 +168,11 @@ namespace basicGameEngine
 
             #region Bullet Movement
 
-            shotOk--;
+            shotOk--;//Lowers shot count 
 
-            if (shot)
+            if (shot)//If spacebar has been clicked
             {
-                if (shotOk < 0)
+                if (shotOk < 0)//If shot count is 0
                 {
                     if (direction == 0)
                     {
@@ -202,7 +210,7 @@ namespace basicGameEngine
                 b.move(b);
             }
 
-            //Remove Bullets
+            //Remove Bullets if they have left the screen
             foreach(Bullets b in bulletsList)
             {
                 if(b.x + b.size < 0 || b.x + b.size > this.Width)
@@ -221,7 +229,7 @@ namespace basicGameEngine
 
             #region Monster Spawning
 
-            if (monsterList.Count() == 0)
+            if (monsterList.Count() == 0)//Spawns if there are no monsters on screen
             {
                 monsterDirection = randGen.Next(0, 4);
                 if (monsterDirection == 0 || monsterDirection == 1)
@@ -239,12 +247,39 @@ namespace basicGameEngine
                 monsterX = randGen.Next(0, this.Width - Properties.Resources.monsterDown.Width - 20);
                 monsterY = randGen.Next(60, this.Height - Properties.Resources.monsterDown.Height - 20);
 
+                //Check if monster is close to player, if so move monster's initial X or Y
+                if(monsterY + monsterHeight < p.y + p.height && monsterY + monsterHeight > p.y)
+                {
+                    if(p.y > this.Height / 2)
+                    {
+                        monsterY -= 150;
+                    }
+                    else if(p.y < this.Height / 2)
+                    {
+                        monsterY += 150;
+                    }
+                }
+
+                if (monsterX + monsterWidth < p.x + p.width && monsterX + monsterWidth > p.y)
+                {
+                    if (p.x > this.Width / 2)
+                    {
+                        monsterX -= 150;
+                    }
+                    else if (p.x < this.Width / 2)
+                    {
+                        monsterX += 150;
+                    }
+                }
+
+                //Create new monster object and add it to list
                 Monster m = new Monster(monsterX, monsterY, monsterWidth, monsterHeight, monsterSpeed, monsterDirection, monsterImage);
                 monsterList.Add(m);
-                monsterSpawn = 20;
-                monsterSpeed++;
+                monsterSpawn = 20;//Reset number of bullets needed to be fired
+                monsterSpeed++;//Increase monster speed for next monster to be spawned
             }
 
+            //If 20 bullets have been fired, add new monster 
             if (monsterSpawn == 0)
             {
                 monsterDirection = randGen.Next(0, 4);
@@ -264,10 +299,36 @@ namespace basicGameEngine
                 monsterX = randGen.Next(0, this.Width - Properties.Resources.monsterDown.Width - 20);
                 monsterY = randGen.Next(0, this.Height - Properties.Resources.monsterDown.Height - 20);
 
+                //Check if monster is close to player, if so move monster's initial X or Y
+                if (monsterY + monsterHeight < p.y + p.height && monsterY + monsterHeight > p.y)
+                {
+                    if (p.y > this.Height / 2)
+                    {
+                        monsterY -= 150;
+                    }
+                    else if (p.y < this.Height / 2)
+                    {
+                        monsterY += 150;
+                    }
+                }
+
+                if (monsterX + monsterWidth < p.x + p.width && monsterX + monsterWidth > p.y)
+                {
+                    if (p.x > this.Width / 2)
+                    {
+                        monsterX -= 150;
+                    }
+                    else if (p.x < this.Width / 2)
+                    {
+                        monsterX += 150;
+                    }
+                }
+
+                //Add new monster
                 Monster m = new Monster(monsterX, monsterY, monsterWidth, monsterHeight, monsterSpeed, monsterDirection, monsterImage);
                 monsterList.Add(m);
-                monsterSpawn = 20;
-                monsterSpeed++;
+                monsterSpawn = 20;//Reset number of bullets needed to be fired
+                monsterSpeed++;//Add to monster speed for next monster
             }
 
             #endregion
@@ -370,15 +431,17 @@ namespace basicGameEngine
                 }
             }
 
+            //Monster and Bullet Collison
             foreach(Monster m in monsterList)
             {
                 foreach(Bullets b in bulletsList)
                 {
                     if(m.collision(m, b))
                     {
+                        //Remove monster and Bullet involved in collison
                         monsterList.Remove(m);
                         bulletsList.Remove(b);
-                        score += 15;
+                        score += 15; //Add 15 to score if collision occurs
                         break;
                     }
                 }

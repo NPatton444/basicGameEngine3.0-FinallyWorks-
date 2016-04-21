@@ -23,6 +23,11 @@ namespace basicGameEngine
             image = _image;
         }
 
+        /// <summary>
+        /// Allows monster to move
+        /// </summary>
+        /// <param name="m">Monster Object</param>
+        /// <param name="direction">Direction of Movement</param>
         public void move(Monster m, int direction)
         {
             if (direction == 2)
@@ -45,9 +50,11 @@ namespace basicGameEngine
 
         public bool collision(Monster m, Bullets b)
         {
+            //Put Bullet and Monster in Box for collision
             Rectangle mRec = new Rectangle(m.x, m.y, m.width, m.height);
             Rectangle bRec = new Rectangle(b.x, b.y, b.size, b.size);
 
+            //Checks collision
             if (mRec.IntersectsWith(bRec))
             {
                 return true;
